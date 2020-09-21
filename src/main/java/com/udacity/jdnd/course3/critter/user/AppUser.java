@@ -2,13 +2,10 @@ package com.udacity.jdnd.course3.critter.user;
 
 import org.hibernate.annotations.Nationalized;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
+@Inheritance
 public abstract class AppUser {
 
     @Id
