@@ -2,6 +2,7 @@ package com.udacity.jdnd.course3.critter.pet;
 
 import com.udacity.jdnd.course3.critter.service.CustomerService;
 import com.udacity.jdnd.course3.critter.service.PetService;
+import com.udacity.jdnd.course3.critter.user.Customer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,9 +25,8 @@ public class PetController {
     @PostMapping
     public PetDTO savePet(@RequestBody PetDTO petDTO) {
         Pet pet = convertPetDTOToPet(petDTO);
-        pet.setId(null);
 
-        return convertPetToPetDTO(petService.savePet(pet));
+        return convertPetToPetDTO(petService.savePet(pet, petDTO.getOwnerId()));
 
     }
 
@@ -60,8 +60,12 @@ public class PetController {
 
     PetDTO convertPetToPetDTO(Pet pet) {
         PetDTO petDTO = new PetDTO();
-        BeanUtils.copyProperties(pet, petDTO);
-//        petDTO.setOwnerId(pet.getCustomer().getId());
+        petDTO.setId(pet.getId());
+        petDTO.setName(pet.getName());
+        petDTO.setType(pet.getType());
+        petDTO.setOwnerId(pet.getCustomer().getId());
+        petDTO.setBirthDate(pet.getBirthDate());
+        petDTO.setNotes(pet.getNotes());
 
         return petDTO;
 
@@ -69,10 +73,10 @@ public class PetController {
 
     Pet convertPetDTOToPet(PetDTO petDTO) {
         Pet pet = new Pet();
-        BeanUtils.copyProperties(petDTO, pet);
-
-//        Customer customer = customerService.getCustomer();
-//        pet.setCustomer(customer);
+        pet.setType(petDTO.getType());
+        pet.setName(petDTO.getName());
+        pet.setBirthDate(petDTO.getBirthDate());
+        pet.setNotes(petDTO.getNotes());
 
         return pet;
 

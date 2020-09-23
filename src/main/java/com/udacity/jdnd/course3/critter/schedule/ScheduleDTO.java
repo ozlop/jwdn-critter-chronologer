@@ -12,7 +12,9 @@ import java.util.Set;
  */
 public class ScheduleDTO {
     private long id;
+    //    TODO: Convert employee obejects to IDs in scheduleDTO conversion method(s)
     private List<Long> employeeIds;
+//    TODO: Convert pet obejects to IDs in scheduleDTO conversion method(s)
     private List<Long> petIds;
     private LocalDate date;
     private Set<EmployeeSkill> activities;

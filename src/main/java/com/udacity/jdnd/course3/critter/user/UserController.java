@@ -1,5 +1,6 @@
 package com.udacity.jdnd.course3.critter.user;
 
+import com.udacity.jdnd.course3.critter.pet.Pet;
 import com.udacity.jdnd.course3.critter.service.CustomerService;
 import com.udacity.jdnd.course3.critter.service.EmployeeService;
 import org.springframework.beans.BeanUtils;
@@ -34,7 +35,7 @@ public class UserController {
     public CustomerDTO saveCustomer(@RequestBody CustomerDTO customerDTO) {
         Customer customer = convertCustomerDTOToCustomer(customerDTO);
 
-        return convertCustomerToCustomerDTO(customerService.saveCustomer(customer));
+        return convertCustomerToCustomerDTO(customerService.saveCustomer(customer, customerDTO.getPetIds()));
     }
 
     @GetMapping("/customer")
@@ -48,7 +49,7 @@ public class UserController {
 
     @GetMapping("/customer/pet/{petId}")
     public CustomerDTO getOwnerByPet(@PathVariable long petId){
-        throw new UnsupportedOperationException();
+        return convertCustomerToCustomerDTO(customerService.getOwnerByPet(petId));
     }
 
     @PostMapping("/employee")
@@ -60,22 +61,30 @@ public class UserController {
 
     @PostMapping("/employee/{employeeId}")
     public EmployeeDTO getEmployee(@PathVariable long employeeId) {
-        throw new UnsupportedOperationException();
+        return convertEmployeeToEmployeeDTO(employeeService.getEmployee(employeeId));
     }
 
     @PutMapping("/employee/{employeeId}")
     public void setAvailability(@RequestBody Set<DayOfWeek> daysAvailable, @PathVariable long employeeId) {
-        throw new UnsupportedOperationException();
+        Employee employee = employeeService.getEmployee(employeeId);
+        employee.setDaysAvailable(daysAvailable);
+        employeeService.saveEmployee(employee);
     }
 
     @GetMapping("/employee/availability")
     public List<EmployeeDTO> findEmployeesForService(@RequestBody EmployeeRequestDTO employeeDTO) {
-        throw new UnsupportedOperationException();
+
+        return employeeService.getEmployeeForService(employeeDTO.getDate(), employeeDTO.getSkills())
+                .stream()
+                .map(this::convertEmployeeToEmployeeDTO)
+                .collect(Collectors.toList());
     }
 
     private CustomerDTO convertCustomerToCustomerDTO(Customer customer) {
         CustomerDTO customerDTO = new CustomerDTO();
         BeanUtils.copyProperties(customer, customerDTO);
+        List<Long> petIds = customer.getPets().stream().map(Pet::getId).collect(Collectors.toList());
+        customerDTO.setPetIds(petIds);
 
         return customerDTO;
 

@@ -20,8 +20,8 @@ public class Schedule {
     @JoinTable(name = "schedule_employees", joinColumns = { @JoinColumn(name = "schedule_id")}, inverseJoinColumns = {@JoinColumn(name = "employee_id")})
     private List<Employee> employees;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id")
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "schedule_pets", joinColumns = { @JoinColumn(name = "schedule_id")}, inverseJoinColumns = {@JoinColumn(name = "pet_id")})
     private List<Pet> pets;
 
     @Column

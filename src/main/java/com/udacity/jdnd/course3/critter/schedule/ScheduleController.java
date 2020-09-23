@@ -1,6 +1,8 @@
 package com.udacity.jdnd.course3.critter.schedule;
 
+import com.udacity.jdnd.course3.critter.pet.Pet;
 import com.udacity.jdnd.course3.critter.service.ScheduleService;
+import com.udacity.jdnd.course3.critter.user.AppUser;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +25,8 @@ public class ScheduleController {
     @PostMapping
     public ScheduleDTO createSchedule(@RequestBody ScheduleDTO scheduleDTO) {
         Schedule schedule = convertScheduleDTOToSchedule(scheduleDTO);
+        System.out.println(schedule.getActivities());
+        schedule = scheduleService.createSchedule(schedule, scheduleDTO.getEmployeeIds(), scheduleDTO.getPetIds());
 
         return convertScheduleToScheduleDTO(schedule);
     }
@@ -38,29 +42,45 @@ public class ScheduleController {
 
     @GetMapping("/pet/{petId}")
     public List<ScheduleDTO> getScheduleForPet(@PathVariable long petId) {
-        throw new UnsupportedOperationException();
+
+        return scheduleService.getScheduleForPet(petId)
+                .stream()
+                .map(this::convertScheduleToScheduleDTO)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/employee/{employeeId}")
     public List<ScheduleDTO> getScheduleForEmployee(@PathVariable long employeeId) {
-        throw new UnsupportedOperationException();
+
+        return scheduleService.getEmployeeSchedule(employeeId)
+                .stream()
+                .map(this::convertScheduleToScheduleDTO)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/customer/{customerId}")
     public List<ScheduleDTO> getScheduleForCustomer(@PathVariable long customerId) {
-        throw new UnsupportedOperationException();
+
+        return scheduleService.getCustomerSchedule(customerId)
+                .stream()
+                .map(this::convertScheduleToScheduleDTO)
+                .collect(Collectors.toList());
     }
 
     private Schedule convertScheduleDTOToSchedule(ScheduleDTO scheduleDTO) {
         Schedule schedule = new Schedule();
-        BeanUtils.copyProperties(scheduleDTO, schedule);
+        schedule.setDate(scheduleDTO.getDate());
+        schedule.setActivities(scheduleDTO.getActivities());
 
         return schedule;
     }
 
     private ScheduleDTO convertScheduleToScheduleDTO(Schedule schedule) {
         ScheduleDTO scheduleDTO = new ScheduleDTO();
-        BeanUtils.copyProperties(schedule, scheduleDTO);
+        scheduleDTO.setEmployeeIds(schedule.getEmployees().stream().map(AppUser::getId).collect(Collectors.toList()));
+        scheduleDTO.setPetIds(schedule.getPets().stream().map(Pet::getId).collect(Collectors.toList()));
+        scheduleDTO.setDate(schedule.getDate());
+        scheduleDTO.setActivities(schedule.getActivities());
 
         return scheduleDTO;
     }
